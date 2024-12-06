@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}catalogue{% endblock %}
+
+{% block content %}
+<h1> Geospatial Data Collection</h1>
+        <h2>Description: {{ catalogue.description }}</h2>
+        <h2>Stac Version: {{ catalogue.stac_version }}</h2>
+
+        <ul>
+        {% for link in catalogue.links %}
+        <li>{{ link.title }}</li>
+            <p>{{ link.href }}</p>
+            
+        <!--<li>{{ link.href }}</li>
+       <li>{{ link.title }}</li>-->
+
+        {% endfor %}
+    </ul>
+{% endblock %}

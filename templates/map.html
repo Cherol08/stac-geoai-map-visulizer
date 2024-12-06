@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}map{% endblock %}
+
+{% block content %}
+<div>
+    <label>
+        <input type="checkbox" id="footfall-layer">
+        Footfall Layer
+    </label>
+    <label>
+        <input type="checkbox" id="traffic-layer">
+        Traffic Layer
+    </label>
+</div>
+<div id="map" style="height: 500px; margin-top: 10px;"></div>
+
+<script>
+    // Initialize the map
+    const map = L.map('map').setView([-26.0747, 28.0010], 14);
+
+    // Add a tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Layers for traffic and footfall
+    let trafficLayer = L.layerGroup();
+    let footfallLayer = L.layerGroup();
+
+    // Function to fetch and load the footfall layer
+    function loadFootfallLayer() {
+        if (footfallLayer.getLayers().length === 0) {
+            fetch('/stac/collections/footfall/items')
+                .then(response => response.json())
+                .then(data => {
+                    data.features.forEach(item => {
+                        L.geoJSON(item.geometry, {
+                            onEachFeature: (feature, layer) => {
+                                const props = item.properties;
+                                layer.bindPopup(`
+                                    <b>FID:</b> ${props.id}<br>
+                                    <b>Population:</b> ${props.total_pop}<br>
+                                    <b>Income Class:</b> ${props.income_class}
+                                `);
+                            }
+                        }).addTo(footfallLayer);
+                    });
+                })
+                .catch(error => console.error('Error loading footfall data:', error));
+        }
+    }
+
+    // Function to fetch and load the traffic layer
+    function loadTrafficLayer() {
+        if (trafficLayer.getLayers().length === 0) {
+            fetch('/stac/collections/traffic/items')
+                .then(response => response.json())
+                .then(data => {
+                    data.features.forEach(item => {
+                        L.geoJSON(item.geometry, {
+                            style: feature => {
+                                return {
+                                    color: feature.properties.traffic_density === "High" ? "red" : "green",
+                                    weight: 3
+                                };
+                            },
+                            onEachFeature: (feature, layer) => {
+                                const props = item.properties;
+                                layer.bindPopup(`
+                                    <b>Road ID:</b> ${props.id}<br>
+                                    <b>Traffic Flow:</b> ${props.traffic_flow}<br>
+                                    <b>Traffic Density:</b> ${props.traffic_density}
+                                `);
+                            }
+                        }).addTo(trafficLayer);
+                    });
+                })
+                .catch(error => console.error('Error loading traffic data:', error));
+        }
+    }
+
+    // Event listeners for layer checkboxes
+    document.getElementById('footfall-layer').addEventListener('change', (event) => {
+        if (event.target.checked) {
+            loadFootfallLayer();
+            map.addLayer(footfallLayer);
+        } else {
+            map.removeLayer(footfallLayer);
+        }
+    });
+
+    document.getElementById('traffic-layer').addEventListener('change', (event) => {
+        if (event.target.checked) {
+            loadTrafficLayer();
+            map.addLayer(trafficLayer);
+        } else {
+            map.removeLayer(trafficLayer);
+        }
+    });
+</script>
+{% endblock %}

@@ -1,8 +1,9 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 import pandas as pd
 import geopandas as gpd
 import json
 from shapely.geometry import shape
+
 # import requests --- use requests model to make calls to geoserver 
 ## add some buttons to make the traffic and footfall layers visible.
 ## 
@@ -32,11 +33,15 @@ def load_geospatial_data(file_path):
 
     return gdf
 
+# MAP
+@app.route('/map')
+def get_map():
+    return render_template('map.html')
 
-# STAC Catalog endpoint
-@app.route('/stac/catalog')
+# STAC Catalogue endpoint
+@app.route('/stac/catalogue')
 def stac_catalog():
-    catalog = {
+    catalogue = {
         "stac_version": "1.0.0",
         "id": "example-catalog",
         "description": "An example STAC catalog",
@@ -49,11 +54,11 @@ def stac_catalog():
             }
         ]
     }
-    return jsonify(catalog)
+    return render_template('catalogue.html', catalogue=catalogue)
 
 
 # STAC Collection endpoint
-@app.route('/stac/collections/geospatial')
+@app.route('/stac/collections')
 def stac_collection():
     collection = {
         "stac_version": "1.0.0",
@@ -79,7 +84,7 @@ def stac_collection():
             }
         ]
     }
-    return jsonify(collection)
+    return render_template('collections.html', collections=collection)
 
 
 # STAC Items endpoint
@@ -137,9 +142,15 @@ def stac_traffic_items():
     })
 
 # Main page for map visualization
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    result = ""
+    if request.method == 'POST':
+        query = request.form.get('query', '').strip()
+        if query:
+            # Simulate a result based on the query (replace with actual logic)
+            result = f"Search results for: '{query}'"
+    return render_template('home.html', result=result)
 
 
 if __name__ == '__main__':
