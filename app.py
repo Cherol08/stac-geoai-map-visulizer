@@ -44,7 +44,7 @@ def stac_catalog():
     catalogue = {
         "stac_version": "1.0.0",
         "id": "example-catalog",
-        "description": "An example STAC catalog",
+        "description": "This STAC catalog contains a collection of footfall and traffic data",
         "links": [
             {
                 "rel": "child",
@@ -74,18 +74,49 @@ def stac_collection():
                 "rel": "item",
                 "href": "/stac/collections/footfall/items",
                 "type": "application/json",
-                "title": "Footfall Data Items"
+                "title": "Footfall Data Items",
+                "fields": """
+                        h3_index => ignore, it is just an id\n
+                        ff_rivil: total footfall mall only,\n
+                        ffc_rivil: total footfall competitors only,\n
+                        ffmc_rivil:total footfall mall and competitors,\n
+                        ff_morning_rivil: morning footfall mall,\n
+                        ff_midday_rivil:midday footfall mall,\n
+                        ff_afternoon_rivil:afternoon footfall mall,\n
+                        ff_evening_rivil:evening footfall mall,\n
+                        ffc_morning_rivil:morning footfall competitors,\n
+                        ffc_midday_rivil:midday footfall competitors ,\n
+                        ffc_afternoon_rivil:afternoon footfall competitors,\n
+                        ffc_evening_rivil:evening footfall competitors,\n
+                        ff_morning_rivil_1 => ignore\n
+                        ff_midday_rivil_1=> ignore,\n
+                        ffc_week_rivil:weekday footfall competitors,\n
+                        ffc_weekend_rivil:weekend footfall competitors,\n
+                        income_class: dominant income class,\n
+                        ff_week_rivil:weekday footfall mall,\n
+                        ff_weekend_rivil:weekend footfall mall\n
+                    """
             },
             {
                 "rel": "item",
                 "href": "/stac/collections/traffic/items",
                 "type": "application/json",
-                "title": "Traffic Data Items"
+                "title": "Traffic Data Items",
+                "fields": """"
+                        netw_id:identifier for individual road segment,\n
+                        day: day of week\n
+                        avg_traffic_den: average daily traffic density,\n
+                        avg_hits: average daily traffic count,\n
+                        total_hits:total traffic count for period,\n
+                        day_num => ignore,\n
+                        daily_ts:timestamp start of day,\n
+                        cars_label: => ignore\n
+                        avg_actual_hits: => ignore\n
+                    """
             }
         ]
     }
     return render_template('collections.html', collections=collection)
-
 
 # STAC Items endpoint
 @app.route('/stac/collections/footfall/items')
@@ -106,7 +137,28 @@ def stac_items():
                 "income_class": row.get('income_class', None),
                 "datetime": "2023-01-01T00:00:00Z"
             },
-            "links": []
+            "links": [],
+            "fields": """"
+                        'h3_index' => ignore, it is just an id
+                        'ff_rivil': total footfall mall only,
+                        'ffc_rivil': total footfall competitors only,
+                        'ffmc_rivil':total footfall mall and competitors,
+                        'ff_morning_rivil': morning footfall mall,
+                        'ff_midday_rivil':midday footfall mall,
+                        'ff_afternoon_rivil':afternoon footfall mall,
+                        'ff_evening_rivil':evening footfall mall,
+                        'ffc_morning_rivil':morning footfall competitors,
+                        'ffc_midday_rivil':midday footfall competitors ,
+                        'ffc_afternoon_rivil':afternoon footfall competitors,
+                        'ffc_evening_rivil':evening footfall competitors,
+                        'ff_morning_rivil_1' => ignore
+                        'ff_midday_rivil_1'=> ignore,
+                        'ffc_week_rivil':weekday footfall competitors,
+                        'ffc_weekend_rivil':weekend footfall competitors,
+                        'income_class': dominant income class,
+                        'ff_week_rivil':weekday footfall mall,
+                        'ff_weekend_rivil':weekend footfall mall
+                    """            
         })
 
     return jsonify({
@@ -133,7 +185,18 @@ def stac_traffic_items():
                 "traffic_density": row.get('traffic_density', None),
                 "datetime": "2023-01-01T00:00:00Z"
             },
-            "links": []
+            "links": [],
+            "fields": """"
+                        'netw_id':identifier for individual road segment,
+                        'day': day of week
+                        'avg_traffic_den': average daily traffic density,
+                        'avg_hits': average daily traffic count,
+                        'total_hits':total traffic count for period,
+                        'day_num' => ignore,
+                        'daily_ts':timestamp start of day,
+                        'cars_label': => ignore
+                        'avg_actual_hits': => ignore
+                    """
         })
 
     return jsonify({

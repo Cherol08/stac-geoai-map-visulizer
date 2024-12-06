@@ -3,13 +3,16 @@
 {% block title %}collections{% endblock %}
 
 {% block content %}
-<h1> Geospatial Data Collection</h1>
+    <h1> Geospatial Data Collection</h1>
         <h2>Description: {{ collections.description }}</h2>
         <h2>Stac Version: {{ collections.stac_version }}</h2>
-
+        </br>
         <ul>
         {% for link in collections.links %}
-        <li>{{ link.title }}</li><p>{{ link.href }}</p>
+        <li><h3>{{ link.title }}</h3></li>
+        <p>Link: {{ link.href }}</p>
+        <p>Lables:<p> 
+        <p>{{ link.fields }}</p>
         <!--<li>{{ link.href }}</li>
        <li>{{ link.title }}</li>-->
 
